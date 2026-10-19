@@ -16,6 +16,11 @@ public sealed class FakeB1Printer
     /// <summary>Captured row/empty-row packets streamed during a print.</summary>
     public List<NiimbotPacket> ReceivedRows { get; } = [];
 
+    public IReadOnlyList<(ushort Page, byte PagePrintProgress, byte PageFeedProgress)> PrintStatusResponses { get; init; } =
+        [(1, 100, 100)];
+
+    private int _printStatusResponseIndex;
+
     public IEnumerable<NiimbotPacket> Respond(NiimbotPacket request)
     {
         switch ((RequestCommandId)request.Command)
@@ -44,8 +49,12 @@ public sealed class FakeB1Printer
             case RequestCommandId.PageEnd:
                 return [Resp(ResponseCommandId.In_PageEnd, 1)];
             case RequestCommandId.PrintStatus:
-                // page=1, pagePrint=100, pageFeed=100 → finished.
-                return [Resp(ResponseCommandId.In_PrintStatus, 0x00, 0x01, 100, 100)];
+            {
+                var response = PrintStatusResponses[Math.Min(_printStatusResponseIndex++, PrintStatusResponses.Count - 1)];
+                return [Resp(ResponseCommandId.In_PrintStatus,
+                    (byte)(response.Page >> 8), (byte)response.Page,
+                    response.PagePrintProgress, response.PageFeedProgress)];
+            }
             case RequestCommandId.PrintEnd:
                 return [Resp(ResponseCommandId.In_PrintEnd, 1)];
             case RequestCommandId.PrintBitmapRow:

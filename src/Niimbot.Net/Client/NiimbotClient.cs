@@ -215,7 +215,8 @@ public sealed class NiimbotClient : IAsyncDisposable
 
         await SendAsync(PacketGenerator.PageEnd(), options.PageTimeout, ct).ConfigureAwait(false);
 
-        await WaitForPrintFinishedAsync(totalPages, options.StatusPollInterval, progress, ct).ConfigureAwait(false);
+        await WaitForPrintFinishedAsync(
+            totalPages, options.StatusPollInterval, profile.PrintTaskVersion, progress, ct).ConfigureAwait(false);
 
         // D110M-v4 sends a one-way heartbeat just before ending the job.
         if (profile.PrintTaskVersion == PrintTaskVersion.D110MV4)
@@ -320,7 +321,8 @@ public sealed class NiimbotClient : IAsyncDisposable
         };
 
     private async Task WaitForPrintFinishedAsync(
-        int totalPages, TimeSpan pollInterval, IProgress<PrintProgress>? progress, CancellationToken ct)
+        int totalPages, TimeSpan pollInterval, PrintTaskVersion taskVersion,
+        IProgress<PrintProgress>? progress, CancellationToken ct)
     {
         while (true)
         {
@@ -328,7 +330,10 @@ public sealed class NiimbotClient : IAsyncDisposable
             var status = await GetPrintStatusAsync(ct).ConfigureAwait(false);
             progress?.Report(new PrintProgress(status.Page, totalPages, status.PagePrintProgress, status.PageFeedProgress));
 
-            if (status.Page >= totalPages && status.PagePrintProgress >= 100 && status.PageFeedProgress >= 100)
+            var finished = taskVersion == PrintTaskVersion.D110MV4
+                ? status.Page >= totalPages
+                : status.Page >= totalPages && status.PagePrintProgress >= 100 && status.PageFeedProgress >= 100;
+            if (finished)
                 return;
 
             await Task.Delay(pollInterval, ct).ConfigureAwait(false);

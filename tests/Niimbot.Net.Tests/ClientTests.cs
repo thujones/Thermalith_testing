@@ -86,6 +86,36 @@ public class ClientTests
     }
 
     [Fact]
+    public async Task PrintAsync_completes_B1_Pro_when_page_count_is_reached_before_feed_progress()
+    {
+        var printer = new FakeB1Printer
+        {
+            ModelId = 4097,
+            PrintStatusResponses =
+            [
+                (0, 0, 0),
+                (1, 100, 90),
+                (1, 100, 100),
+            ],
+        };
+        var transport = new FakeTransport { Responder = printer.Respond };
+        await using var client = new NiimbotClient(transport);
+        await client.ConnectAsync();
+
+        await client.PrintAsync(
+            new MonochromeBitmap(16, 1, new byte[2]),
+            new PrintOptions { StatusPollInterval = TimeSpan.Zero });
+
+        var printStatuses = transport.WrittenPackets
+            .Count(packet => packet.Command == (byte)RequestCommandId.PrintStatus);
+        Assert.Equal(2, printStatuses);
+        Assert.DoesNotContain(transport.WrittenPackets,
+            packet => packet.Command == (byte)RequestCommandId.PageStart);
+        Assert.Contains(transport.WrittenPackets,
+            packet => packet.Command == (byte)RequestCommandId.PrintEnd);
+    }
+
+    [Fact]
     public async Task PrintAsync_rejects_a_bitmap_wider_than_the_printhead()
     {
         var (client, _, _) = NewB1();

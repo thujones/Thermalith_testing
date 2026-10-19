@@ -46,6 +46,7 @@ public static class KnownPrinterFacts
     public static readonly IReadOnlySet<int> D110MV4PrintTaskModelIds = new HashSet<int>
     {
         528, // D11_H — hardware-confirmed
+        4097, // B1 Pro — issue #21 hardware-confirmed
     };
 
     public static bool IsVerified(IEnumerable<int> modelIds) => modelIds.Any(VerifiedModelIds.Contains);

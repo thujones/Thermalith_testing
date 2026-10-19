@@ -18,6 +18,15 @@ public class ProfileTests
     }
 
     [Fact]
+    public void B1_Pro_resolves_to_the_D110M_v4_print_task()
+    {
+        var profile = PrinterProfiles.FromModelId(4097);
+
+        Assert.Equal("B1 Pro", profile.ModelName);
+        Assert.Equal(PrintTaskVersion.D110MV4, profile.PrintTaskVersion);
+    }
+
+    [Fact]
     public void B1_max_print_width_is_about_48mm()
     {
         var profile = PrinterProfiles.B1;
