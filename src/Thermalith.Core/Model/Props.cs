@@ -24,6 +24,7 @@ public sealed record TextProps
     public double? MinFontSizePt { get; init; }
     public double? MaxFontSizePt { get; init; }
     public bool AutoSize { get; init; }                  // editor keeps W/H = the measured text (box hugs glyphs)
+    public bool Invert { get; init; }
 
     [JsonExtensionData] public Dictionary<string, JsonElement>? Extensions { get; init; }
 }

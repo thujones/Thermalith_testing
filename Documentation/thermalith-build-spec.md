@@ -238,7 +238,7 @@ These are the concrete JSON field names backing the prose controls catalog in §
 
 | `type` | `props` fields |
 |---|---|
-| `text` | `content` (token-aware), `fontFamily`, `fontSizePt`, `bold`, `italic`, `underline`, `lineSpacing`, `letterSpacing`, `wrap` (`none`/`word`), `fontSizing` (`fixed`/`shrink`/`fill` — auto-scale to the box), `minFontSizePt`, `maxFontSizePt` |
+| `text` | `content` (token-aware), `fontFamily`, `fontSizePt`, `bold`, `italic`, `underline`, `invert` (black box with white text), `lineSpacing`, `letterSpacing`, `wrap` (`none`/`word`), `fontSizing` (`fixed`/`shrink`/`fill` — auto-scale to the box), `minFontSizePt`, `maxFontSizePt` |
 | `barcode` | `symbology`, `value` (token-aware), `showText`, `textPosition` (`above`/`below`/`none`), `moduleWidthMm`, `quietZoneMm` |
 | `qr` | `value` (token-aware), `encoding` (`text`/`hex`), `ecLevel` (`L`/`M`/`Q`/`H`), `moduleSizeMm` (or `"auto"`), `quietZoneMm` |
 | `serial` | `start`, `step`, `padLength`, `padChar`, `prefix`, `suffix` (the live counter is runtime state, not stored in the doc) |

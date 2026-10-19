@@ -116,15 +116,22 @@ public sealed class LabelRenderer
 
     private void DrawText(DrawContext ctx, ResolvedText t)
     {
-        if (string.IsNullOrEmpty(t.Text)) return;
         var boxW = ctx.Px(t.WMm);
         var boxH = ctx.Px(t.HMm);
         var dpi = ctx.PxPerMm * 25.4;
 
+        if (t.Invert)
+        {
+            using var background = new SKPaint { Color = SKColors.Black, Style = SKPaintStyle.Fill };
+            ctx.Canvas.DrawRect(SKRect.Create(ctx.Px(t.XMm), ctx.Px(t.YMm), boxW, boxH), background);
+        }
+
+        if (string.IsNullOrEmpty(t.Text)) return;
+
         var tf = _fonts.Resolve(t.Style.FontFamily, t.Style.Bold, t.Style.Italic); // FontService owns the typeface lifetime
         using var paint = new SKPaint
         {
-            Color = SKColors.Black,
+            Color = t.Invert ? SKColors.White : SKColors.Black,
             IsAntialias = true,           // text: AA on → threshold (§6.3.3)
             Typeface = tf,
             FakeBoldText = t.Style.Bold && !TypefaceIsBold(tf),
@@ -162,7 +169,7 @@ public sealed class LabelRenderer
             DrawLineText(ctx.Canvas, lines[i], x, baseline, paint, letterSpacingPx);
             if (t.Style.Underline)
             {
-                using var ul = new SKPaint { Color = SKColors.Black, IsAntialias = true, StrokeWidth = Math.Max(1, paint.TextSize / 14f) };
+                using var ul = new SKPaint { Color = paint.Color, IsAntialias = true, StrokeWidth = Math.Max(1, paint.TextSize / 14f) };
                 var uy = baseline - metrics.Descent / 2;
                 ctx.Canvas.DrawLine(x, uy, x + lineW, uy, ul);
             }

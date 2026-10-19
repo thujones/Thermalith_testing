@@ -60,6 +60,7 @@ public static class LabelResolver
                 FontSizing = t.Props.FontSizing,
                 MinFontSizePt = t.Props.MinFontSizePt,
                 MaxFontSizePt = t.Props.MaxFontSizePt,
+                     Invert = t.Props.Invert,
                 AutoSize = t.Props.AutoSize,
             }, el, justify),
 

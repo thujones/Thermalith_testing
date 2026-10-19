@@ -18,6 +18,7 @@ public sealed partial class TextEditorViewModel : ElementEditorViewModel
     [ObservableProperty] private bool _bold;
     [ObservableProperty] private bool _italic;
     [ObservableProperty] private bool _underline;
+    [ObservableProperty] private bool _invert;
     [ObservableProperty] private double? _lineSpacing;
     [ObservableProperty] private double _letterSpacing;
     [ObservableProperty] private string _wrap;
@@ -31,6 +32,7 @@ public sealed partial class TextEditorViewModel : ElementEditorViewModel
         _bold = el.Props.Bold ?? false;
         _italic = el.Props.Italic ?? false;
         _underline = el.Props.Underline ?? false;
+        _invert = el.Props.Invert;
         _lineSpacing = el.Props.LineSpacing;
         _letterSpacing = el.Props.LetterSpacing;
         _wrap = el.Props.Wrap;
@@ -53,7 +55,7 @@ public sealed partial class TextEditorViewModel : ElementEditorViewModel
         Props = new TextProps
         {
             Content = Content, FontFamily = NullIfEmpty(FontFamily), FontSizePt = FontSizePt,
-            Bold = Bold, Italic = Italic, Underline = Underline,
+            Bold = Bold, Italic = Italic, Underline = Underline, Invert = Invert,
             LineSpacing = LineSpacing, LetterSpacing = LetterSpacing,
             Wrap = Wrap, AutoSize = AutoSize,
             // FontSizing left at the model default ("fixed"); Min/Max dropped — the editor is fixed-size

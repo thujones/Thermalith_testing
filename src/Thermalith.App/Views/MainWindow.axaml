@@ -754,6 +754,8 @@
                                     <TextBlock Classes="section" Text="Content" />
                                     <TextBox Text="{Binding Content, UpdateSourceTrigger=PropertyChanged}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="48"
                                              ToolTip.Tip="The text to print. Use {token} placeholders for data-merge fields; Enter adds a line break." />
+                                    <CheckBox IsChecked="{Binding Invert}" Content="Invert Text Box" Margin="0,2"
+                                              ToolTip.Tip="Fill the text box black and render its text white." />
 
                                     <TextBlock Classes="section" Text="Font" />
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="Typeface. The list is the app's bundled fonts; an unavailable font falls back at render (flagged by the validator)."><TextBlock Text="Font" /><ComboBox Classes="fld" Grid.Column="1" ItemsSource="{x:Static ed:EditorOptions.Fonts}" SelectedItem="{Binding SelectedFont}" /></Grid>

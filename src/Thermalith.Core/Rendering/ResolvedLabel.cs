@@ -42,6 +42,7 @@ public sealed record ResolvedText : ResolvedElement
     public string FontSizing { get; init; } = "fixed";
     public double? MinFontSizePt { get; init; }
     public double? MaxFontSizePt { get; init; }
+    public bool Invert { get; init; }
 
     /// <summary>The source Text element hugs its glyphs — the renderer re-sizes W/H to the *resolved* text
     /// so a data-merge value grows the box, not just the authored token (GitHub #7). Serial/DateTime are

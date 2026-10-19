@@ -74,6 +74,62 @@ public class RenderTests
     }
 
     [Fact]
+    public void Inverted_text_fills_its_box_and_renders_glyphs_white()
+    {
+        using var fonts = new FontService();
+        var renderer = new LabelRenderer(fonts);
+        var text = new TextElement
+        {
+            Id = "inverted",
+            X = 2,
+            Y = 2,
+            W = 20,
+            H = 10,
+            Props = new TextProps
+            {
+                Content = "M",
+                FontFamily = FontService.BundledFamily,
+                FontSizePt = 16,
+                Wrap = "none",
+            },
+        };
+        var label = new LabelDocument
+        {
+            Metadata = new LabelMetadata { Name = "inversion" },
+            Canvas = new Canvas { WidthMm = 30, HeightMm = 20, Dpi = 203 },
+            Elements = [text],
+        };
+        var normal = renderer.RenderGray(label, new ResolveContext());
+        var inverted = renderer.RenderGray(label with
+        {
+            Elements = [text with { Props = text.Props with { Invert = true } }],
+        }, new ResolveContext());
+
+        var pxPerMm = 203 / 25.4;
+        var boxRight = (int)((text.X + text.W - 1) * pxPerMm);
+        var boxBottom = (int)((text.Y + text.H - 1) * pxPerMm);
+        Assert.Equal((byte)255, normal.Gray[boxBottom * normal.WidthPx + boxRight]);
+        Assert.Equal((byte)0, inverted.Gray[boxBottom * inverted.WidthPx + boxRight]);
+        Assert.Equal(normal.Gray[0], inverted.Gray[0]);
+
+        var foundWhiteGlyph = false;
+        var boxLeft = (int)(text.X * pxPerMm);
+        var boxTop = (int)(text.Y * pxPerMm);
+        for (var y = boxTop; y < boxBottom && !foundWhiteGlyph; y++)
+        for (var x = boxLeft; x < boxRight; x++)
+        {
+            var index = y * normal.WidthPx + x;
+            if (normal.Gray[index] < 32 && inverted.Gray[index] > 223)
+            {
+                foundWhiteGlyph = true;
+                break;
+            }
+        }
+
+        Assert.True(foundWhiteGlyph, "Expected the black glyph to become white when inverted.");
+    }
+
+    [Fact]
     public void Serial_advances_with_row_index()
     {
         using var fonts = new FontService();
