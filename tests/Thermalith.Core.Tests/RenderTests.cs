@@ -85,7 +85,12 @@ public class RenderTests
                 new DateTimeElement
                 {
                     Id = "dt",
-                    Props = new DateTimeProps { FontFamily = "Test Typeface", FontSizePt = 12, Invert = true, AutoSize = true },
+                    Props = new DateTimeProps
+                    {
+                        FontFamily = "Test Typeface", FontSizePt = 12,
+                        Bold = true, Italic = true, Underline = true,
+                        Invert = true, AutoSize = true,
+                    },
                 },
             ],
         };
@@ -94,6 +99,9 @@ public class RenderTests
 
         Assert.Equal("Test Typeface", resolved.Style.FontFamily);
         Assert.Equal(12, resolved.Style.FontSizePt);
+        Assert.True(resolved.Style.Bold);
+        Assert.True(resolved.Style.Italic);
+        Assert.True(resolved.Style.Underline);
         Assert.True(resolved.Invert);
         Assert.True(resolved.AutoSize);
     }

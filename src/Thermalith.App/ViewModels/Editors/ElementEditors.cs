@@ -165,6 +165,9 @@ public sealed partial class DateTimeEditorViewModel : ElementEditorViewModel
     [ObservableProperty] private string? _fixedValueUtc;
     [ObservableProperty] private string? _fontFamily;
     [ObservableProperty] private double? _fontSizePt;
+    [ObservableProperty] private bool _bold;
+    [ObservableProperty] private bool _italic;
+    [ObservableProperty] private bool _underline;
     [ObservableProperty] private bool _invert;
     [ObservableProperty] private bool _autoSize;
 
@@ -176,6 +179,9 @@ public sealed partial class DateTimeEditorViewModel : ElementEditorViewModel
         _fixedValueUtc = el.Props.FixedValueUtc;
         _fontFamily = el.Props.FontFamily;
         _fontSizePt = el.Props.FontSizePt;
+        _bold = el.Props.Bold ?? false;
+        _italic = el.Props.Italic ?? false;
+        _underline = el.Props.Underline ?? false;
         _invert = el.Props.Invert;
         _autoSize = el.Props.AutoSize;
         MarkLoaded();
@@ -195,7 +201,8 @@ public sealed partial class DateTimeEditorViewModel : ElementEditorViewModel
         Props = new DateTimeProps
         {
             Kind = Kind, Format = Format, Source = Source, FixedValueUtc = FixedValueUtc,
-            FontFamily = NullIfEmpty(FontFamily), FontSizePt = FontSizePt, Invert = Invert, AutoSize = AutoSize,
+            FontFamily = NullIfEmpty(FontFamily), FontSizePt = FontSizePt,
+            Bold = Bold, Italic = Italic, Underline = Underline, Invert = Invert, AutoSize = AutoSize,
         },
     };
 

@@ -822,9 +822,14 @@
                                               ToolTip.Tip="Make the box hug the formatted date/time at the selected font size." />
                                     <TextBlock Classes="section" Text="Font" />
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="Typeface. The list is the app's bundled fonts; an unavailable font falls back at render."><TextBlock Text="Font" /><ComboBox Classes="fld" Grid.Column="1" ItemsSource="{x:Static ed:EditorOptions.Fonts}" SelectedItem="{Binding SelectedFont}" /></Grid>
-                                    <Grid Classes="frow" ColumnDefinitions="90,*">
+                                    <Grid Classes="frow" ColumnDefinitions="90,120,*">
                                         <TextBlock Text="Size (pt)" />
                                         <NumericUpDown Grid.Column="1" Value="{Binding FontSizePt, Converter={StaticResource Nz}}" Minimum="1" Maximum="500" />
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="3" HorizontalAlignment="Right">
+                                            <ToggleButton Classes="icon" ToolTip.Tip="Bold" IsChecked="{Binding Bold}"><mi:MaterialIcon Kind="FormatBold" /></ToggleButton>
+                                            <ToggleButton Classes="icon" ToolTip.Tip="Italic" IsChecked="{Binding Italic}"><mi:MaterialIcon Kind="FormatItalic" /></ToggleButton>
+                                            <ToggleButton Classes="icon" ToolTip.Tip="Underline" IsChecked="{Binding Underline}"><mi:MaterialIcon Kind="FormatUnderline" /></ToggleButton>
+                                        </StackPanel>
                                     </Grid>
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="What to show: date, time, or date+time."><TextBlock Text="Kind" /><ComboBox Classes="fld" Grid.Column="1" ItemsSource="{x:Static ed:EditorOptions.DateKind}" SelectedItem="{Binding Kind}" /></Grid>
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="Date/time format string (.NET): yyyy=year, MM=month, dd=day, HH=24h, mm=min. E.g. yyyy-MM-dd or dd MMM yyyy."><TextBlock Text="Format" /><TextBox Grid.Column="1" Text="{Binding Format, UpdateSourceTrigger=PropertyChanged}" /></Grid>

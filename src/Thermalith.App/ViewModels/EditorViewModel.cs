@@ -71,7 +71,7 @@ public sealed partial class EditorViewModel : ObservableObject
     private bool _syncingSelection;
     private Dictionary<string, GeomMm>? _dragGeoms;
     private DragMode _dragMode = DragMode.None;
-    private bool _autoSizeConverted; // a resize turned the selected auto-size text box into a fixed one (#5)
+    private bool _autoSizeConverted; // a resize turned the selected auto-size text/date-time box into a fixed one (#5)
     private Handle _dragHandle;
     private bool _dragMoved;
     // Start endpoints (absolute mm) of a Line being dragged by one of its endpoint handles.
@@ -764,13 +764,18 @@ public sealed partial class EditorViewModel : ObservableObject
                 (sx, sy, sw, sh) = SnapResize(_dragHandle, x, y, w, h);
             }
             // Resizing an auto-size text box takes manual control of its size → switch Auto-size off so the
-            // drag sticks (and the box becomes a fixed, word-wrapping area), GitHub #5.
+            // drag sticks and the box becomes fixed, GitHub #5.
             ReplaceIn(list, id, e =>
             {
                 if (e is TextElement { Props.AutoSize: true } te)
                 {
                     _autoSizeConverted = true; // rebuild the inspector at EndDrag so its checkbox updates
                     return te with { X = sx, Y = sy, W = sw, H = sh, Props = te.Props with { AutoSize = false } };
+                }
+                if (e is DateTimeElement { Props.AutoSize: true } dt)
+                {
+                    _autoSizeConverted = true;
+                    return dt with { X = sx, Y = sy, W = sw, H = sh, Props = dt.Props with { AutoSize = false } };
                 }
                 return e with { X = sx, Y = sy, W = sw, H = sh };
             });
@@ -787,8 +792,8 @@ public sealed partial class EditorViewModel : ObservableObject
     public void EndDrag()
     {
         if (_dragMoved) { _history.Commit(_live); RaiseState(); }
-        // A resize just flipped an auto-size text box to fixed → rebuild the inspector so its Auto-size
-        // checkbox reflects the change (GitHub #5).
+        // A resize just flipped an auto-size text/date-time box to fixed → rebuild the inspector so its
+        // Auto-size checkbox reflects the change (GitHub #5).
         if (_autoSizeConverted && SelectedEditor is { } ed && _live.Elements.FirstOrDefault(e => e.Id == ed.Id) is { } el)
             SelectedEditor = ElementEditorViewModel.Create(el, OnElementEdited);
         _autoSizeConverted = false;
@@ -1254,10 +1259,10 @@ public sealed partial class EditorViewModel : ObservableObject
         foreach (var id in _selectedIds)
             if (_live.Elements.FirstOrDefault(e => e.Id == id) is { } e)
             {
-                // Dashed box tracks what's drawn (GitHub #5): serial/datetime + auto-size text hug their
-                // glyphs; a fixed/wrap text box keeps its authored area (the wrap region), grown to include
-                // any overflow; everything else is its model box. Rotated elements carry the rotation so the
-                // view draws the box rotated about the element's centre.
+                // Dashed box tracks what's drawn (GitHub #5): serial and auto-size text/date-time hug their
+                // glyphs; fixed text/date-time keeps its authored area, grown to include any overflow;
+                // everything else is its model box. Rotated elements carry the rotation so the view draws
+                // the box rotated about the element's centre.
                 var b = BoxFor(e);
                 double left = b.XMm * s, top = b.YMm * s;
                 double angle = 0, ccx = 0, ccy = 0;
@@ -1272,15 +1277,13 @@ public sealed partial class EditorViewModel : ObservableObject
 
         HasSelection = _selectedIds.Count > 0;
 
-        // Resize handles only make sense for a single, unlocked, manually-sized selection. An auto-size
-        // text box is driven by its glyphs, so it shows no handles (toggle Auto-size off to resize).
+        // Resize handles only make sense for a single, unlocked selection.
         var primary = _selectedIds.Count == 1
             ? _live.Elements.FirstOrDefault(e => e.Id == _selectedIds.First())
             : null;
-        // Serial/DateTime hug their glyphs (size follows the value/font) → no resize handles. Auto-size
-        // text DOES show handles: grabbing one converts it to a fixed box (handled in DragTo), which is the
-        // discoverable way to get a fixed, wrapping box (GitHub #5).
-        var noHandles = primary is { Locked: true } or SerialElement or DateTimeElement;
+        // Serial elements hug their glyphs and remain non-resizable. Auto-size Text and Date/Time elements
+        // show handles: resizing converts them to fixed boxes (handled in DragTo).
+        var noHandles = primary is { Locked: true } or SerialElement;
         if (_selectedIds.Count == 1 && !noHandles && primary is LineElement ln)
         {
             SelectionBounds = new Rect(ln.X * s, ln.Y * s, ln.W * s, ln.H * s);
@@ -1347,11 +1350,13 @@ public sealed partial class EditorViewModel : ObservableObject
         LabelRenderer.RotatedAabb(Content(e), e.Rotation, e.X + e.W / 2, e.Y + e.H / 2);
 
     /// <summary>The un-rotated rectangle to draw the selection box around (GitHub #5); the caller rotates it
-    /// with the element. Content-driven elements hug their glyphs; a fixed/wrap text box keeps its authored
-    /// area (grown to include any overflow); other elements use their (rendered) box.</summary>
+    /// with the element. Content-driven elements hug their glyphs; fixed text/date-time boxes keep their
+    /// authored area (grown to include any overflow); other elements use their (rendered) box.</summary>
     private RenderedRect BoxFor(LabelElement e) => e switch
     {
-        SerialElement or DateTimeElement => Content(e),
+        SerialElement => Content(e),
+        DateTimeElement { Props.AutoSize: true } => Content(e),
+        DateTimeElement => Union(Content(e), new RenderedRect(e.X, e.Y, e.W, e.H)),
         TextElement { Props.AutoSize: true } => Content(e),
         TextElement => Union(Content(e), new RenderedRect(e.X, e.Y, e.W, e.H)),
         _ => Content(e),

@@ -80,6 +80,9 @@ public sealed record DateTimeProps
     public string? FixedValueUtc { get; init; }
     public string? FontFamily { get; init; }
     public double? FontSizePt { get; init; }
+    public bool? Bold { get; init; }
+    public bool? Italic { get; init; }
+    public bool? Underline { get; init; }
     public bool Invert { get; init; }
     public bool AutoSize { get; init; } = true;
 

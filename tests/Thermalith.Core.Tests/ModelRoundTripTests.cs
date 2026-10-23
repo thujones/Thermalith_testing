@@ -74,7 +74,12 @@ public class ModelRoundTripTests
                 new DateTimeElement
                 {
                     Id = "dt",
-                    Props = new DateTimeProps { FontFamily = "Test Typeface", FontSizePt = 12, Invert = true, AutoSize = true },
+                    Props = new DateTimeProps
+                    {
+                        FontFamily = "Test Typeface", FontSizePt = 12,
+                        Bold = true, Italic = true, Underline = true,
+                        Invert = true, AutoSize = true,
+                    },
                 },
             ],
         };
@@ -84,6 +89,9 @@ public class ModelRoundTripTests
 
         Assert.Equal("Test Typeface", props.FontFamily);
         Assert.Equal(12, props.FontSizePt);
+        Assert.True(props.Bold);
+        Assert.True(props.Italic);
+        Assert.True(props.Underline);
         Assert.True(props.Invert);
         Assert.True(props.AutoSize);
     }
