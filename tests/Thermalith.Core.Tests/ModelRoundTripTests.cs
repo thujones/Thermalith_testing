@@ -63,6 +63,38 @@ public class ModelRoundTripTests
     }
 
     [Fact]
+    public void DateTime_font_and_inversion_round_trip()
+    {
+        var original = new LabelDocument
+        {
+            Metadata = new LabelMetadata { Name = "datetime-style" },
+            Canvas = new Canvas { WidthMm = 40, HeightMm = 20, Dpi = 203 },
+            Elements =
+            [
+                new DateTimeElement
+                {
+                    Id = "dt",
+                    Props = new DateTimeProps { FontFamily = "Test Typeface", FontSizePt = 12, Invert = true, AutoSize = true },
+                },
+            ],
+        };
+
+        var roundTripped = LabelDocumentSerializer.FromJson(LabelDocumentSerializer.ToJson(original));
+        var props = Assert.IsType<DateTimeElement>(Assert.Single(roundTripped.Elements)).Props;
+
+        Assert.Equal("Test Typeface", props.FontFamily);
+        Assert.Equal(12, props.FontSizePt);
+        Assert.True(props.Invert);
+        Assert.True(props.AutoSize);
+    }
+
+    [Fact]
+    public void DateTime_auto_size_defaults_to_enabled()
+    {
+        Assert.True(new DateTimeProps().AutoSize);
+    }
+
+    [Fact]
     public void Unknown_fields_round_trip_via_extension_data()
     {
         const string json = """

@@ -63,6 +63,10 @@ in sequence.
 - **Format** — the display format (a .NET format string, e.g. `yyyy-MM-dd`).
 - **Source** — *printNow* fills in the current date/time at print, or *fixed* uses a set value.
 - **Fixed value** — the value to use when **Source** is *fixed* (ISO-8601, UTC).
+- **Font** — choose a typeface from the available fonts, or use the bundled default.
+- **Size (pt)** — set the date/time font size.
+- **Auto-size box to date/time** — fit the box to the formatted date/time at the selected font size.
+- **Invert Text Box** — fill the box black and print the date/time in white.
 
 ## Shape
 

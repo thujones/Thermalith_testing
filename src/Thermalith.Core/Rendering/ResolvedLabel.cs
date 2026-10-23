@@ -44,9 +44,8 @@ public sealed record ResolvedText : ResolvedElement
     public double? MaxFontSizePt { get; init; }
     public bool Invert { get; init; }
 
-    /// <summary>The source Text element hugs its glyphs — the renderer re-sizes W/H to the *resolved* text
-    /// so a data-merge value grows the box, not just the authored token (GitHub #7). Serial/DateTime are
-    /// generated text but keep their authored box (false), so their print position is stable.</summary>
+    /// <summary>The source text element hugs its glyphs — the renderer re-sizes W/H to the *resolved* text
+    /// so data-merge values and generated date/time values use their actual rendered dimensions.</summary>
     public bool AutoSize { get; init; }
 }
 

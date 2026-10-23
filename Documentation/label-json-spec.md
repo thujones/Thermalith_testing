@@ -224,6 +224,10 @@ Runtime counter is **not** stored in the template; it advances per row at batch 
 | `format` | string | `yyyy-MM-dd` | .NET format string. |
 | `source` | enum | `printNow` | `printNow` (resolved at print) \| `fixed`. |
 | `fixedValueUtc` | string (ISO-8601) | — | Required when `source = fixed`. |
+| `fontFamily` | string | — | Optional typeface; omitted uses the inherited or bundled font. |
+| `fontSizePt` | number | — | Optional font size in points; omitted uses the inherited or default size. |
+| `invert` | bool | false | Fill the element box black and render the date/time in white. |
+| `autoSize` | bool | true | Size the box to the formatted date/time at the resolved font size. |
 
 ### 11.7 `shape` (`props`)
 

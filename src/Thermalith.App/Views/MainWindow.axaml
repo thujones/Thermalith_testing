@@ -816,6 +816,16 @@
                             <DataTemplate DataType="ed:DateTimeEditorViewModel">
                                 <StackPanel Spacing="2">
                                     <views:BaseElementFields />
+                                    <CheckBox IsChecked="{Binding Invert}" Content="Invert Text Box" Margin="0,2"
+                                              ToolTip.Tip="Fill the text box black and render its text white." />
+                                    <CheckBox IsChecked="{Binding AutoSize}" Content="Auto-size box to date/time" Margin="0,2"
+                                              ToolTip.Tip="Make the box hug the formatted date/time at the selected font size." />
+                                    <TextBlock Classes="section" Text="Font" />
+                                    <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="Typeface. The list is the app's bundled fonts; an unavailable font falls back at render."><TextBlock Text="Font" /><ComboBox Classes="fld" Grid.Column="1" ItemsSource="{x:Static ed:EditorOptions.Fonts}" SelectedItem="{Binding SelectedFont}" /></Grid>
+                                    <Grid Classes="frow" ColumnDefinitions="90,*">
+                                        <TextBlock Text="Size (pt)" />
+                                        <NumericUpDown Grid.Column="1" Value="{Binding FontSizePt, Converter={StaticResource Nz}}" Minimum="1" Maximum="500" />
+                                    </Grid>
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="What to show: date, time, or date+time."><TextBlock Text="Kind" /><ComboBox Classes="fld" Grid.Column="1" ItemsSource="{x:Static ed:EditorOptions.DateKind}" SelectedItem="{Binding Kind}" /></Grid>
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="Date/time format string (.NET): yyyy=year, MM=month, dd=day, HH=24h, mm=min. E.g. yyyy-MM-dd or dd MMM yyyy."><TextBlock Text="Format" /><TextBox Grid.Column="1" Text="{Binding Format, UpdateSourceTrigger=PropertyChanged}" /></Grid>
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="printNow = stamped with the date/time at print; fixed = use the Fixed value below."><TextBlock Text="Source" /><ComboBox Classes="fld" Grid.Column="1" ItemsSource="{x:Static ed:EditorOptions.DateSource}" SelectedItem="{Binding Source}" /></Grid>

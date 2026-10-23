@@ -201,9 +201,8 @@ public sealed partial class EditorViewModel : ObservableObject
         return true;
     }
 
-    /// <summary>Resize every auto-size text element's box to its measured glyphs — applied on load so
-    /// the seed label (and any opened file) opens hugged, not just elements added/edited in-session.</summary>
-    private LabelDocument ApplyAutoSizeToText(LabelDocument doc)
+    /// <summary>Resize auto-size text and date/time boxes to their measured glyphs on load.</summary>
+    private LabelDocument ApplyAutoSizeToElements(LabelDocument doc)
     {
         var dpi = doc.Canvas.Dpi;
         var changed = false;
@@ -214,6 +213,11 @@ public sealed partial class EditorViewModel : ObservableObject
                 var (wmm, hmm) = _renderer.MeasureTextMm(t.Props, dpi);
                 double w = Math.Ceiling(wmm), h = Math.Ceiling(hmm);
                 if (Math.Abs(w - t.W) > 1e-6 || Math.Abs(h - t.H) > 1e-6) { changed = true; return t with { W = w, H = h }; }
+            }
+            if (e is DateTimeElement dt && dt.Props.AutoSize)
+            {
+                var (w, h) = MeasureDateTimeMm(dt, doc);
+                if (Math.Abs(w - dt.W) > 1e-6 || Math.Abs(h - dt.H) > 1e-6) { changed = true; return dt with { W = w, H = h }; }
             }
             return e;
         }).ToList();
@@ -247,7 +251,7 @@ public sealed partial class EditorViewModel : ObservableObject
     {
         _manifest = manifest ?? new Manifest { Id = DocumentFactory.NewId(), Name = doc.Metadata.Name };
         _assets = assets;
-        _live = ApplyAutoSizeToText(MigrateLegacyLines(doc)); // migrate legacy lines, then hug auto-size text boxes
+        _live = ApplyAutoSizeToElements(MigrateLegacyLines(doc));
         _history = new SnapshotHistory(_live);
         _gestureActive = false;
         FilePath = path;
@@ -278,6 +282,12 @@ public sealed partial class EditorViewModel : ObservableObject
             updated = t with { W = w, H = h };
             SelectedEditor.SetGeometrySilently(t.X, t.Y, w, h); // reflect measured size in the inspector
         }
+        else if (updated is DateTimeElement dt && dt.Props.AutoSize)
+        {
+            var (w, h) = MeasureDateTimeMm(dt, _live);
+            updated = dt with { W = w, H = h };
+            SelectedEditor.SetGeometrySilently(dt.X, dt.Y, w, h);
+        }
         // Table cell data lives on the canvas, not the inspector — preserve the live cells/header/axis sizes
         // through structural edits (Cols/Rows/Line-weight/geometry), resizing the grid for Cols/Rows changes.
         if (updated is TableElement tabNew && existing is TableElement tabOld)
@@ -305,7 +315,7 @@ public sealed partial class EditorViewModel : ObservableObject
                 {
                     if (e.Id == updated.Id) return updated;
                     if (!ids.Contains(e.Id) || e.GetType() != updated.GetType()) return e;
-                    return AutoSizeIfText(ApplyProperty(e, updated, changedProp));
+                    return AutoSizeElement(ApplyProperty(e, updated, changedProp));
                 }).ToList(),
             };
         }
@@ -324,14 +334,34 @@ public sealed partial class EditorViewModel : ObservableObject
         RequestRender();
     }
 
-    private LabelElement AutoSizeIfText(LabelElement el)
+    private LabelElement AutoSizeElement(LabelElement el)
     {
         if (el is TextElement t && t.Props.AutoSize)
         {
             var (wmm, hmm) = _renderer.MeasureTextMm(t.Props, _live.Canvas.Dpi);
             return t with { W = Math.Ceiling(wmm), H = Math.Ceiling(hmm) };
         }
+        if (el is DateTimeElement dt && dt.Props.AutoSize)
+        {
+            var (w, h) = MeasureDateTimeMm(dt, _live);
+            return dt with { W = w, H = h };
+        }
         return el;
+    }
+
+    private (double WidthMm, double HeightMm) MeasureDateTimeMm(DateTimeElement element, LabelDocument doc)
+    {
+        var visibleElement = element with { Visible = true };
+        var hasElement = doc.Elements.Any(e => e.Id == element.Id);
+        var measuredDoc = doc with
+        {
+            Elements = hasElement
+                ? doc.Elements.Select(e => e.Id == element.Id ? (LabelElement)visibleElement : e).ToList()
+                : [.. doc.Elements, visibleElement],
+        };
+        var resolved = _renderer.Resolve(measuredDoc, new ResolveContext { Now = DateTimeOffset.Now });
+        var text = resolved.Elements.OfType<ResolvedText>().Single(e => e.Id == element.Id);
+        return (Math.Ceiling(text.WMm), Math.Ceiling(text.HMm));
     }
 
     /// <summary>Copy one changed property's value from <paramref name="src"/> onto a same-type sibling for
@@ -399,6 +429,10 @@ public sealed partial class EditorViewModel : ObservableObject
                 "Format" => t with { Props = t.Props with { Format = s.Props.Format } },
                 "Source" => t with { Props = t.Props with { Source = s.Props.Source } },
                 "FixedValueUtc" => t with { Props = t.Props with { FixedValueUtc = s.Props.FixedValueUtc } },
+                "FontFamily" or "SelectedFont" => t with { Props = t.Props with { FontFamily = s.Props.FontFamily } },
+                "FontSizePt" => t with { Props = t.Props with { FontSizePt = s.Props.FontSizePt } },
+                "Invert" => t with { Props = t.Props with { Invert = s.Props.Invert } },
+                "AutoSize" => t with { Props = t.Props with { AutoSize = s.Props.AutoSize } },
                 _ => target,
             },
             (ShapeElement t, ShapeElement s) => prop switch
@@ -587,6 +621,11 @@ public sealed partial class EditorViewModel : ObservableObject
         {
             var (wmm, hmm) = _renderer.MeasureTextMm(t.Props, _live.Canvas.Dpi);
             el = t with { W = Math.Ceiling(wmm), H = Math.Ceiling(hmm) };
+        }
+        else if (el is DateTimeElement dt && dt.Props.AutoSize)
+        {
+            var (w, h) = MeasureDateTimeMm(dt, _live);
+            el = dt with { W = w, H = h };
         }
         _live = _live with { Elements = _live.Elements.Append(el).ToList() };
         _history.Commit(_live);

@@ -21,7 +21,7 @@ public static class ElementFactory
             "barcode" => new BarcodeElement { Id = id, Name = "Barcode", X = x, Y = y, W = w, H = h, Justify = new Justify { H = "center" }, Props = new BarcodeProps { Symbology = "code128", Value = "12345" } },
             "qr" => new QrElement { Id = id, Name = "QR", X = x, Y = y, W = w, H = h, Props = new QrProps { Value = "https://example.com" } },
             "serial" => new SerialElement { Id = id, Name = "Serial", X = x, Y = y, W = w, H = h, Justify = Center(), Props = new SerialProps { Start = 1, PadLength = 4, Prefix = "SN" } },
-            "datetime" => new DateTimeElement { Id = id, Name = "Date", X = x, Y = y, W = w, H = h, Justify = Center(), Props = new DateTimeProps { Kind = "date", Format = "yyyy-MM-dd", Source = "printNow" } },
+            "datetime" => new DateTimeElement { Id = id, Name = "Date", X = x, Y = y, W = w, H = h, Justify = Center(), Props = new DateTimeProps { Kind = "date", Format = "yyyy-MM-dd", Source = "printNow", FontSizePt = 10 } },
             "shape" => new ShapeElement { Id = id, Name = "Shape", X = x, Y = y, W = w, H = h, Props = new ShapeProps { ShapeType = "rect", StrokeWidthMm = 0.3 } },
             "line" => MakeLine(canvas),
             "image" => new ImageElement { Id = id, Name = "Image", X = x, Y = y, W = w, H = h, Props = new ImageProps() },

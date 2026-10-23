@@ -78,6 +78,10 @@ public sealed record DateTimeProps
     public string Format { get; init; } = "yyyy-MM-dd";  // .NET format string
     public string Source { get; init; } = "printNow";    // printNow | fixed
     public string? FixedValueUtc { get; init; }
+    public string? FontFamily { get; init; }
+    public double? FontSizePt { get; init; }
+    public bool Invert { get; init; }
+    public bool AutoSize { get; init; } = true;
 
     [JsonExtensionData] public Dictionary<string, JsonElement>? Extensions { get; init; }
 }

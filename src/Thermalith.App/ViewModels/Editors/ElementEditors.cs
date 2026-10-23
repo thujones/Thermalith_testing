@@ -163,6 +163,10 @@ public sealed partial class DateTimeEditorViewModel : ElementEditorViewModel
     [ObservableProperty] private string _format;
     [ObservableProperty] private string _source;
     [ObservableProperty] private string? _fixedValueUtc;
+    [ObservableProperty] private string? _fontFamily;
+    [ObservableProperty] private double? _fontSizePt;
+    [ObservableProperty] private bool _invert;
+    [ObservableProperty] private bool _autoSize;
 
     public DateTimeEditorViewModel(DateTimeElement el, Action<string?> onChanged) : base(el, onChanged)
     {
@@ -170,14 +174,32 @@ public sealed partial class DateTimeEditorViewModel : ElementEditorViewModel
         _format = el.Props.Format;
         _source = el.Props.Source;
         _fixedValueUtc = el.Props.FixedValueUtc;
+        _fontFamily = el.Props.FontFamily;
+        _fontSizePt = el.Props.FontSizePt;
+        _invert = el.Props.Invert;
+        _autoSize = el.Props.AutoSize;
         MarkLoaded();
     }
+
+    public string SelectedFont
+    {
+        get => string.IsNullOrWhiteSpace(FontFamily) ? EditorOptions.BundledFont : FontFamily!;
+        set => FontFamily = value == EditorOptions.BundledFont ? null : value;
+    }
+
+    partial void OnFontFamilyChanged(string? value) => OnPropertyChanged(nameof(SelectedFont));
 
     public override LabelElement ToElement() => new DateTimeElement
     {
         Id = Id, Name = Name, X = X, Y = Y, W = W, H = H, Rotation = Rotation, Locked = Locked, Visible = Visible, Justify = JustifyValue(),
-        Props = new DateTimeProps { Kind = Kind, Format = Format, Source = Source, FixedValueUtc = FixedValueUtc },
+        Props = new DateTimeProps
+        {
+            Kind = Kind, Format = Format, Source = Source, FixedValueUtc = FixedValueUtc,
+            FontFamily = NullIfEmpty(FontFamily), FontSizePt = FontSizePt, Invert = Invert, AutoSize = AutoSize,
+        },
     };
+
+    private static string? NullIfEmpty(string? s) => string.IsNullOrWhiteSpace(s) ? null : s;
 }
 
 public sealed partial class ShapeEditorViewModel : ElementEditorViewModel

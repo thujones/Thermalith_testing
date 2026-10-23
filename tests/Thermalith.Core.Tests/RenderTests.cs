@@ -74,6 +74,31 @@ public class RenderTests
     }
 
     [Fact]
+    public void DateTime_font_and_inversion_flow_to_resolved_text()
+    {
+        var doc = new LabelDocument
+        {
+            Metadata = new LabelMetadata { Name = "datetime-style" },
+            Canvas = new Canvas { WidthMm = 40, HeightMm = 20, Dpi = 203 },
+            Elements =
+            [
+                new DateTimeElement
+                {
+                    Id = "dt",
+                    Props = new DateTimeProps { FontFamily = "Test Typeface", FontSizePt = 12, Invert = true, AutoSize = true },
+                },
+            ],
+        };
+
+        var resolved = Assert.IsType<ResolvedText>(LabelResolver.Resolve(doc, FrozenContext).Elements.Single());
+
+        Assert.Equal("Test Typeface", resolved.Style.FontFamily);
+        Assert.Equal(12, resolved.Style.FontSizePt);
+        Assert.True(resolved.Invert);
+        Assert.True(resolved.AutoSize);
+    }
+
+    [Fact]
     public void Inverted_text_fills_its_box_and_renders_glyphs_white()
     {
         using var fonts = new FontService();

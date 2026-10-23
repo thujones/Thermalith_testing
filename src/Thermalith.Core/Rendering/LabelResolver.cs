@@ -97,7 +97,9 @@ public static class LabelResolver
             {
                 Id = el.Id,
                 Text = ExpandDateTime(d.Props, ctx.Now),
-                Style = BuildStyle(doc, el, null, null, null, null, null, null, 0),
+                Style = BuildStyle(doc, el, d.Props.FontFamily, d.Props.FontSizePt, null, null, null, null, 0),
+                Invert = d.Props.Invert,
+                AutoSize = d.Props.AutoSize,
             }, el, justify),
 
             ShapeElement sh => Geo(new ResolvedShape
