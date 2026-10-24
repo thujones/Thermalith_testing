@@ -680,7 +680,7 @@
                 <TabItem Header="Properties">
                     <ScrollViewer Padding="8" HorizontalScrollBarVisibility="Disabled"
                                   VerticalScrollBarVisibility="Auto" ScrollViewer.AllowAutoHide="False">
-                        <StackPanel>
+                        <StackPanel Width="{Binding $parent[ScrollViewer].Viewport.Width}">
                         <!-- Table cell controls (mirror the right-click cell menu) — shown in cell-edit mode. -->
                         <StackPanel IsVisible="{Binding InspectorShowsCells}" Spacing="3">
                             <TextBlock Text="Table" FontWeight="Bold" Margin="0,0,0,2" />
@@ -743,7 +743,7 @@
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="Bleed margin (mm) outside the label edge. The validator warns when content sits past it — used for deliberate over-print onto continuous media."><TextBlock Text="Bleed mm" /><NumericUpDown Grid.Column="1" Value="{Binding BleedMm, Converter={StaticResource Nz}}" Increment="0.1" Minimum="0" /></Grid>
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="The printer's maximum print width (mm). Content wider than this is cropped at print (the printable-area guide shows the limit). Blank = auto from the connected printer."><TextBlock Text="Printhead W" /><NumericUpDown Grid.Column="1" Value="{Binding PrintheadWidthMm, Converter={StaticResource Nz}}" Increment="0.1" Minimum="0" Watermark="auto" /></Grid>
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="Soft safe margin (mm) inset on every edge — a guide to keep content clear of this printer's skew/registration (e.g. the B4's ~1 mm). It's a guide only: nothing crops to it, you can place a control outside if you choose. 0 = off."><TextBlock Text="Margin mm" /><NumericUpDown Grid.Column="1" Value="{Binding SafeMarginMm, Converter={StaticResource Nz}}" Increment="0.1" Minimum="0" /></Grid>
-                                    <TextBlock Text="Margin guide = your safe margin on all edges, floored at the printhead crop on the width axis. Guides only — nothing is cropped to the margin." Foreground="{DynamicResource TextHint}" FontSize="11" TextWrapping="Wrap" Margin="0,4" />
+                                    <TextBlock Text="Margin guide = your safe margin on all edges, floored at the printhead crop on the width axis. Guides only — nothing is cropped to the margin." Foreground="{DynamicResource TextHint}" FontSize="11" TextWrapping="Wrap" MaxWidth="{Binding $parent[ScrollViewer].Viewport.Width}" Margin="0,4" />
                                 </StackPanel>
                             </DataTemplate>
 
@@ -760,7 +760,7 @@
                                     <TextBlock Classes="section" Text="Font" />
                                     <Grid Classes="frow" ColumnDefinitions="90,*" ToolTip.Tip="Typeface. The list is the app's bundled fonts; an unavailable font falls back at render (flagged by the validator)."><TextBlock Text="Font" /><ComboBox Classes="fld" Grid.Column="1" ItemsSource="{x:Static ed:EditorOptions.Fonts}" SelectedItem="{Binding SelectedFont}" /></Grid>
                                     <!-- Size + B/I/U share one row. -->
-                                    <Grid Classes="frow" ColumnDefinitions="90,120,*">
+                                    <Grid Classes="frow" ColumnDefinitions="Auto,*,Auto">
                                         <TextBlock Text="Size (pt)" />
                                         <NumericUpDown Grid.Column="1" Value="{Binding FontSizePt, Converter={StaticResource Nz}}" Minimum="1" Maximum="500" />
                                         <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="3" HorizontalAlignment="Right">
